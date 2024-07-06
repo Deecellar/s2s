@@ -475,6 +475,13 @@ fn intToLittleEndianBytes(val: anytype) [@sizeOf(@TypeOf(val))]u8 {
     return res;
 }
 
+fn CalculateNextPowerOfTwoInteger(T: anytype) type {
+    const bits = if(@typeInfo(@TypeOf(T)) == .Type) @bitSizeOf(T) else @bitSizeOf(@TypeOf(T));
+    const signedness = if(@typeInfo(@TypeOf(T)) == .Type) @typeInfo(T).Int.signedness else @typeInfo(@TypeOf(T)).Int.signedness;
+    const nearest_power_of_two: u16 = if(bits < 8) 8 else std.math.ceilPowerOfTwo(u16, bits) catch unreachable;
+    return std.meta.Int(signedness, nearest_power_of_two);
+}
+
 /// Computes a unique type hash from `T` to identify deserializing invalid data.
 /// Incorporates field order and field type, but not field names, so only checks
 /// for structural equivalence. Compile errors on unsupported or comptime types.
